@@ -158,7 +158,43 @@ using namespace std;
 //}
 
 // arrays in c++
+//int main()
+//{
+//    int luckyNums[] = {4, 8, 15, 16, 23, 42};
+//    // index:          0  1   2   3   4   5
+//
+//    cout << "luckyNums: " << luckyNums << endl;
+//    cout << "luckyNums[0]: " << luckyNums[0] << endl;
+//
+//    luckyNums[0] = 8;
+//    cout << "luckyNums[0]: " << luckyNums[0] << endl;
+//
+//    // giving arrays a size
+//    int fixedLuckyNums[20] = {4, 8, 15, 16, 23, 42};
+//
+//    fixedLuckyNums[20] = 22;
+//
+//    cout << "fixedLuckyNums[20]: " << fixedLuckyNums[20] << endl;
+//
+//    return 0;
+//}
+
+// functions in c++
+
+// functions need information:
+//  1. return type
+
+// functions need to know each others' existence
+
+void sayHi(string name);
+
 int main()
 {
-    
+    // purpose of main function is to be executed when file is run
+    sayHi("robo");
+    return 0;
+}
+
+void sayHi(string name) {
+    cout << "Hello user: " << name << endl;
 }
