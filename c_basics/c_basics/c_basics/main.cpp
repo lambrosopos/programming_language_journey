@@ -186,15 +186,16 @@ using namespace std;
 
 // functions need to know each others' existence
 
-void sayHi(string name);
+//void sayHi(string name);
+//
+//int main()
+//{
+//    // purpose of main function is to be executed when file is run
+//    sayHi("robo");
+//    return 0;
+//}
+//
+//void sayHi(string name) {
+//    cout << "Hello user: " << name << endl;
+//}
 
-int main()
-{
-    // purpose of main function is to be executed when file is run
-    sayHi("robo");
-    return 0;
-}
-
-void sayHi(string name) {
-    cout << "Hello user: " << name << endl;
-}
