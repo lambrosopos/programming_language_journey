@@ -14,6 +14,12 @@ class Book {
     string title;
     string author;
     int pages;
+    // Constructor when no args are given
+    Book() {
+      title = "No title";
+      author = "No author";
+      pages = 0;
+    }
     // Constructor functions
     Book(string aTitle, string aAuthor, int aPages) {
       // defining values in the constructor
@@ -32,10 +38,15 @@ int main() {
   //book1.title = "Alice in Wonderland";
   //book1.author = "Lewis Carroll";
   //book1.pages = 100;
+  Book book2;
 
   cout << book1.pages << endl;
   cout << book1.title << endl;
   cout << book1.author << endl;
+
+  cout << book2.pages << endl;
+  cout << book2.title << endl;
+  cout << book2.author << endl;
 
   return 0;
 }
