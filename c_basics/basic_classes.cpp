@@ -14,15 +14,24 @@ class Book {
     string title;
     string author;
     int pages;
+    // Constructor functions
+    Book(string aTitle, string aAuthor, int aPages) {
+      // defining values in the constructor
+      title = aTitle;
+      author = aAuthor;
+      pages = aPages;
+
+      cout << "Creating Object: " << title << endl;
+    }
 };
 
 
 int main() {
   // creating an object which is an instance of the class
-  Book book1;
-  book1.title = "Alice in Wonderland";
-  book1.author = "Lewis Carroll";
-  book1.pages = 100;
+  Book book1("Alice in Wonderland", "Lewis Carroll", 100);
+  //book1.title = "Alice in Wonderland";
+  //book1.author = "Lewis Carroll";
+  //book1.pages = 100;
 
   cout << book1.pages << endl;
   cout << book1.title << endl;
