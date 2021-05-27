@@ -3,10 +3,11 @@
 using namespace std;
 
 class Movie {
+  private:
+    string rating;
   public:
     string title;
     string director;
-    string rating;
 
     Movie(string aTitle, string aDirector, string aRating) {
       title = aTitle;
