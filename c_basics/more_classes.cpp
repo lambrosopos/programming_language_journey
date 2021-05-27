@@ -16,9 +16,11 @@ class Movie {
     }
 
     void setRating(string aRating) {
-      if (aRating == "G" || aRating == "PG" || aRating == "R" || aRating == "PG-13") {
+      if (aRating == "PG" || aRating == "R" || aRating == "PG-13") {
         rating = aRating;
-      };
+      } else {
+        rating = "No Rating";
+      }
     }
 
     string getRating() {
