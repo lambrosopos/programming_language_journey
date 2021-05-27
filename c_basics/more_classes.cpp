@@ -20,6 +20,10 @@ class Movie {
         rating = aRating;
       };
     }
+
+    string getRating() {
+      return rating;
+    }
 };
 
 int main() {
@@ -27,7 +31,7 @@ int main() {
 
   avengers.setRating("R");
 
-  cout << avengers.rating << endl;
+  cout << avengers.getRating() << endl;
   return 0;
 }
 
