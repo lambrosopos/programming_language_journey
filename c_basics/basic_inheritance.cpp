@@ -21,6 +21,10 @@ class Chef {
 };
 
 class ItalianChef : public Chef {
+  public:
+    void makePasta() {
+      cout << "The chef makes pasta" << endl;
+    }
 };
 
 int main()
@@ -30,6 +34,7 @@ int main()
 
   ItalianChef italianChef;
   italianChef.makeChicken();
+  italianChef.makePasta();
   return 0;
 }
 
