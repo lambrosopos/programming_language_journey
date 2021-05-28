@@ -7,6 +7,7 @@ using namespace std;
  * same in C++
  */
 
+// This class if called superclass
 class Chef {
   public:
     void makeChicken() {
@@ -21,6 +22,7 @@ class Chef {
 };
 
 
+// ItalianChef is called 'subclass'
 class ItalianChef : public Chef {
   public:
     void makePasta() {
