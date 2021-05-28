@@ -20,21 +20,24 @@ class Chef {
     }
 };
 
+
 class ItalianChef : public Chef {
   public:
     void makePasta() {
       cout << "The chef makes pasta" << endl;
+    }
+    void makeSpecialDish() {
+      cout << "The chef makes chicken rice" << endl;
     }
 };
 
 int main()
 {
   Chef chef;
-  chef.makeChicken();
+  chef.makeSpecialDish();
 
   ItalianChef italianChef;
-  italianChef.makeChicken();
-  italianChef.makePasta();
+  italianChef.makeSpecialDish();
   return 0;
 }
 
