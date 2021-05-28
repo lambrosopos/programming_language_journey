@@ -1,6 +1,12 @@
 #include <iostream>
 using namespace std;
 
+/* Inheritance
+ * 
+ * Inheritance allows other classes to mimic same methods and properties
+ * same in C++
+ */
+
 class Chef {
   public:
     void makeChicken() {
@@ -14,10 +20,16 @@ class Chef {
     }
 };
 
+class ItalianChef : public Chef {
+};
+
 int main()
 {
   Chef chef;
   chef.makeChicken();
+
+  ItalianChef italianChef;
+  italianChef.makeChicken();
   return 0;
 }
 
