@@ -2,7 +2,7 @@
 using namespace std;
 
 /* Inheritance
- * 
+ *
  * Inheritance allows other classes to mimic same methods and properties
  * same in C++
  */
@@ -42,4 +42,3 @@ int main()
   italianChef.makeSpecialDish();
   return 0;
 }
-
