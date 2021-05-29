@@ -18,6 +18,7 @@ public:
   // everything in class in c++ is private by default
   string Name;
   string Company;
+
   int Age;
 
   void IntroduceYourself() {
@@ -27,14 +28,9 @@ public:
   }
 };
 
-int main()
-{
-  Employee employee1;
-  employee1.Name = "Nyang++";
-  employee1.Company = "Bulb Cat";
-  employee1.Age = 10;
-
-  employee1.IntroduceYourself();
-
-  return 0;
+int main() {
+  Employee employer;
+  employer.Name = "Nyang++";
+  employer.Company = "Bulb Cat";
+  employer.Age = 10;
 }
