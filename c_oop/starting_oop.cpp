@@ -26,17 +26,30 @@ public:
     std::cout << "Company - " << Company << std::endl;
     std::cout << "Age - " << Age << std::endl;
   }
+  /* Constructors
+   *
+   * Constructors are special methods that are invoked
+   * when initiating an object
+   * 
+   * When a constructor is not given, c++ uses a default constructor
+   *
+   * Creating a constructor has 3 rules:
+   *
+   * 1) Does not have a return value
+   * 2) Has the same name as the class
+   * 3) Constructor has to be public (not always)
+   */
+  Employee(string name, string company, int age) {
+    Name = name;
+    Company = company;
+    Age = age;
+  }
 };
 
 int main() {
-  Employee employer;
-  employer.Name = "Nyang++";
-  employer.Company = "Bulb Cat";
-  employer.Age = 10;
+  Employee employee1 = Employee("Patrick", "Bikini Ltd.", 14);
+  employee1.IntroduceYourself();
 
-  Employee employee2;
-  employee2.Name = "John";
-  employee2.Company = "Amazon";
-  employee2.Age = 35;
+  Employee employee2 = Employee("John", "Amazon", 35);
   employee2.IntroduceYourself();
 }
