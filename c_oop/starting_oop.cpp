@@ -14,18 +14,14 @@ using std::string;
  */
 
 class Employee {
-public:
+private:
   // everything in class in c++ is private by default
   string Name;
   string Company;
 
   int Age;
 
-  void IntroduceYourself() {
-    std::cout << "Name - " << Name << std::endl;
-    std::cout << "Company - " << Company << std::endl;
-    std::cout << "Age - " << Age << std::endl;
-  }
+public:
   /* Constructors
    *
    * Constructors are special methods that are invoked
@@ -44,6 +40,20 @@ public:
     Company = company;
     Age = age;
   }
+
+  void IntroduceYourself() {
+    std::cout << "Name - " << Name << std::endl;
+    std::cout << "Company - " << Company << std::endl;
+    std::cout << "Age - " << Age << std::endl;
+  }
+
+  void setName(string name) {
+    Name = name;
+  }
+
+  string getName() {
+    return Name;
+  }
 };
 
 int main() {
@@ -52,4 +62,5 @@ int main() {
 
   Employee employee2 = Employee("John", "Amazon", 35);
   employee2.IntroduceYourself();
+
 }
