@@ -17,25 +17,78 @@ const int height = 20;
 int x, y, fruitX, fruitY, score;
 
 // tracking directions
+ 
+// enum is user-defined data type.
+// only one value can be selected at a time
+enum eDirection { STOP=0, LEFT, RIGHT, UP, DOWN } dir;
 
 
 void Setup() {
-  gameOver = false;
+    gameOver = false;
+
+    // Initial direction snake moves is 0, 'STOP'
+    dir = STOP;
+
+    // Initial position is at the middle of the screen
+    x = width / 2;
+    y = height /2;
+
+    fruitX = rand() % width;
+    fruitY = rand() % height;
+
+    score = 0;
 }
 
 void Draw() {
+    // std::system to access system CLI
+    system("clear");
+
+    // printing top wall
+    for (int i = 0; i < width; i++) {
+        cout << '#';
+    }
+
+    cout << endl;
+
+    // printing inner walls
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            if (j == 0) {
+                cout << '#';
+            } else {
+                cout << ' ';
+            }
+
+            if (j == width - 1) {
+                cout << '#';
+            }
+        }
+        cout << endl;
+    }
+
+
+
+
+    // printing bottom wall
+    for (int i = 0; i < width; i++) {
+        cout << '#';
+    }
+
+    cout << endl;
 }
 
-void Input() {}
+void Input() {
+}
 
-void Logic() {}
+void Logic() {
+}
 
 int main() 
 {
-  Setup();
-  while (!gameOver) {
-    Draw();
-    Input();
-    Logic();
-  }
+    Setup();
+    while (!gameOver) {
+        Draw();
+        Input();
+        Logic();
+    }
 }
