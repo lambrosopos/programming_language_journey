@@ -51,15 +51,15 @@ void Draw() {
     cout << endl;
 
     // printing inner walls
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
+    for (int i = 0; i < height - 2; i++) {
+        for (int j = 0; j < width - 1; j++) {
             if (j == 0) {
                 cout << '#';
             } else {
                 cout << ' ';
             }
 
-            if (j == width - 1) {
+            if (j == width - 2) {
                 cout << '#';
             }
         }
