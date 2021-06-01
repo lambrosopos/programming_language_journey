@@ -1,4 +1,5 @@
 #include <iostream>
+#include <conio.h>
 using namespace std;
 
 /* Games need 4 functions
@@ -55,6 +56,12 @@ void Draw() {
         for (int j = 0; j < width - 1; j++) {
             if (j == 0) {
                 cout << '#';
+            }
+
+            if (i == y && j == x) {
+                cout << "O";
+            } else if (i == fruitY && j == fruitX) {
+                cout << 'F';
             } else {
                 cout << ' ';
             }
@@ -64,6 +71,7 @@ void Draw() {
             }
         }
         cout << endl;
+
     }
 
 
@@ -78,6 +86,27 @@ void Draw() {
 }
 
 void Input() {
+    // get keyboard input
+    if (_kbhit()) {
+        // get key pressed
+        switch (_getch()) {
+            case 'a':
+                dir = LEFT;
+                break;
+            case 'w':
+                dir = UP;
+                break;
+            case 's':
+                dir = DOWN;
+                break;
+            case 'd':
+                dir = RIGHT;
+                break;
+            case 'x':
+                gameOver = true;
+                break;
+        }
+    }
 }
 
 void Logic() {
