@@ -1,5 +1,5 @@
 #include <iostream>
-#include <conio.h>
+//#include <conio.h>
 using namespace std;
 
 /* Games need 4 functions
@@ -87,26 +87,26 @@ void Draw() {
 
 void Input() {
     // get keyboard input
-    if (_kbhit()) {
+    //if (_kbhit()) {
         // get key pressed
-        switch (_getch()) {
-            case 'a':
-                dir = LEFT;
-                break;
-            case 'w':
-                dir = UP;
-                break;
-            case 's':
-                dir = DOWN;
-                break;
-            case 'd':
-                dir = RIGHT;
-                break;
-            case 'x':
-                gameOver = true;
-                break;
-        }
-    }
+        //switch (_getch()) {
+            //case 'a':
+                //dir = LEFT;
+                //break;
+            //case 'w':
+                //dir = UP;
+                //break;
+            //case 's':
+                //dir = DOWN;
+                //break;
+            //case 'd':
+                //dir = RIGHT;
+                //break;
+            //case 'x':
+                //gameOver = true;
+                //break;
+        //}
+    //}
 }
 
 void Logic() {
