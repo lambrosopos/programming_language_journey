@@ -52,6 +52,7 @@ class Case1
 //}
 
 // Use case 2: return reference to the calling object
+/*
 class Case2
 {
     private:
@@ -88,3 +89,47 @@ int main()
     obj1.print();
     return 0;
 }
+*/
+
+
+/* Example 1
+class Test
+{
+private:
+  int x;
+  int y;
+public:
+  Test(int x = 0, int y = 0) { this->x = x; this->y = y; }
+  static void fun1() { cout << "Inside fun1()"; }
+  void fun2() { cout << "Inside fun2()"; this->fun1(); }
+};
+  
+int main()
+{
+  Test obj;
+  obj.fun2();
+  return 0;
+}
+*/
+
+  
+/* Example 2: 'this' is an expression and gives an error -> expression is not assignable
+class Test
+{
+private:
+  int x;
+public:
+  Test(int x = 0) { this->x = x; }
+  void change(Test *t) { this = t; }
+  void print() { cout << "x = " << x << endl; }
+};
+  
+int main()
+{
+  Test obj(5);
+  Test *ptr = new Test (10);
+  obj.change(ptr);
+  obj.print();
+  return 0;
+}
+*/
