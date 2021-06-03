@@ -25,20 +25,28 @@ using namespace std;
 class Case1
 {
     private:
-        int x = 30;
+        int x;
     public:
         void setX (int x)
         {
-            //this->x = x;
+            this->x = x;
         }
-        void print() { cout << "x = " << x << endl; }
+        void print(int x) 
+        {
+            // you can reference specific member's value with this
+            cout << "x = " << this->x << endl;
+        }
 };
 
 int main()
 {
-    Case1 obj;
+    Case1 obj_1;
     int x = 20;
-    obj.setX(x);
-    obj.print();
+    obj_1.setX(x);
+    obj_1.print(40);
+
+    Case1 obj_2;
+    obj_2.setX(25);
+    obj_2.print(45);
     return 0;
 }
