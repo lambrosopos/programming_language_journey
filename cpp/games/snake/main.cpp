@@ -1,5 +1,6 @@
 #include <iostream>
-//#include <conio.h>
+#include <ncurses.h>
+
 using namespace std;
 
 /* Games need 4 functions
@@ -12,19 +13,25 @@ bool gameOver;
 
 // setup width and height -> dimensions for the game
 const int width = 20;
-const int height = 20;
+const int height = 10;
 
 // snake and fruit locations and the game score
 int x, y, fruitX, fruitY, score;
-
 // tracking directions
  
 // enum is user-defined data type.
 // only one value can be selected at a time
-enum eDirection { STOP=0, LEFT, RIGHT, UP, DOWN } dir;
+enum eDirection { STOP=0, LEFT, RIGHT, UP, DOWN };
+eDirection dir;
 
 
 void Setup() {
+    initscr();
+    clear();
+    noecho();
+    cbreak();
+    curs_set(0);
+
     gameOver = false;
 
     // Initial direction snake moves is 0, 'STOP'
@@ -34,59 +41,50 @@ void Setup() {
     x = width / 2;
     y = height /2;
 
-    fruitX = rand() % width;
-    fruitY = rand() % height;
+    fruitX = (rand() % width) + 1;
+    fruitY = (rand() % height) + 1;
 
     score = 0;
 }
 
 void Draw() {
     // std::system to access system CLI
-    system("clear");
+    clear();
 
     // printing top wall
-    for (int i = 0; i < width; i++) {
-        cout << '#';
-    }
+    for (int i = 0; i < width + 2; i++)
+        mvprintw(0, 1, "+");
 
-    cout << endl;
-
-    // printing inner walls
-    for (int i = 0; i < height - 2; i++) {
-        for (int j = 0; j < width - 1; j++) {
-            if (j == 0) {
-                cout << '#';
-            }
-
-            if (i == y && j == x) {
-                cout << "O";
-            } else if (i == fruitY && j == fruitX) {
-                cout << 'F';
-            } else {
-                cout << ' ';
-            }
-
-            if (j == width - 2) {
-                cout << '#';
-            }
+    for (int i = 0; i < height + 2; i++)
+    {
+        for (int j = 0; j < width + 2; j++)
+        {
+            if (i == 0 | i == 21)
+                mvprintw(i, j, "+");
+            else if (j== 0 | j == 21)
+                mvprintw(i, j, "+");
+            else if (i == y && j == x)
+                mvprintw(i, j, "O");
+            else if (i == fruitY && j == fruitX)
+                mvprintw(i, j, "@");
         }
-        cout << endl;
-
     }
+    mvprintw(23, 0, "Score %d", score);
 
+    refresh();
+    getch();
+    endwin();
 
-
-
-    // printing bottom wall
-    for (int i = 0; i < width; i++) {
-        cout << '#';
-    }
-
-    cout << endl;
 }
 
 void Input() {
     // get keyboard input
+    char inputChar;
+    cout << "what the heck =================";
+    cin >> inputChar;
+
+    cout << inputChar << endl;
+
     //if (_kbhit()) {
         // get key pressed
         //switch (_getch()) {
@@ -115,9 +113,11 @@ void Logic() {
 int main() 
 {
     Setup();
-    while (!gameOver) {
-        Draw();
-        Input();
-        Logic();
-    }
+    Draw();
+    //while (!gameOver) {
+        //Draw();
+        //Input();
+        //Logic();
+    //}
+    return 0;
 }
