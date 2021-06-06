@@ -78,7 +78,10 @@ int main() {
     delete[] a2d;
 
     // dealing with array of arrays leads to memory fragmentation
-    // 
+    // nothing guarantees that the nested elements and arrays
+    // will be located sequentially.
+    // This means time is spent on finding array locations.
+    // This means you have to initialize array in a single instance
 
     return 0;
 }
