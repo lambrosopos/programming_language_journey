@@ -62,5 +62,23 @@ int main() {
     // accessing a3d
     a3d[0][0][0] = 0;
 
+
+    // deleting
+    // if you only delete a2d, there will now be a memory leak
+    // since we have just deleted the array that holds
+    // the information of the elements in the array
+
+    // eg.
+    // delete[] a2d;
+
+    // so you must delete all the inner elements first
+    for (int i = 0; i < 50; i++)
+        delete[] a2d[i];
+
+    delete[] a2d;
+
+    // dealing with array of arrays leads to memory fragmentation
+    // 
+
     return 0;
 }
