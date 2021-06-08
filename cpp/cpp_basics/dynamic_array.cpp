@@ -22,12 +22,11 @@ using namespace std;
 
 int main()
 {
-    // with arrays
-    // you can only add 5 elements to this array
+    // with arrays you can only add 5 elements to this array
     int *vertices = new int[5];
 
     // with vector
-    vector <int> new_vertices; 
+    std::vector<int> new_array;
 
     cin.get(); 
 }
