@@ -1,10 +1,11 @@
+"""
+matrix 방법은 다른 방법으로 풀어야 함 -> 테케 런타임 오류;;
+"""
+
 import time
 from pprint import pprint
 
 def solution(rows, columns, queries):
-    # rows = 3, columns = 2
-    # range(1, 6 + 2, 3) => 1, 4, 7
-    # list(range(1, 1 % rows * columns + 1))
     matrix = [list(range(_, _ + columns)) for _ in range(1, rows * columns + 1, rows)]
     
    	# query => 4 번째보다 현 y2 가 적으면 아래로 하강~
@@ -25,7 +26,7 @@ def solution(rows, columns, queries):
         up_boundary = query[0] - 1
 
         def get_num(position):
-            return matrix[position[0]][position[1]]
+            return matrix[position[0]][posi]tion[1]]
 
         def set_num(curr_pos, num):
             matrix[curr_pos[0]][curr_pos[1]] = num
@@ -67,10 +68,6 @@ def solution(rows, columns, queries):
                     answer.append(min_num)
                     flag = False
             min_num = min(min_num, curr_num)
-            # print(f"Current direction: {direction}")
-            # print(f"Current position: {current_position}")
-            # time.sleep(1)
-            # pprint(matrix)
     return answer
 
 if __name__ == "__main__":
