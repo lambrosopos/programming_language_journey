@@ -35,6 +35,7 @@ def solution(answers):
     return highest_person
 
 
+
 if __name__ == "__main__":
     problems = [1, 2, 1, 2, 2]
     ans = solution(problems)
