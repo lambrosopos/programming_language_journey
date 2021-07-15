@@ -11,9 +11,12 @@ def solution(answers):
         if val == pattern_1[idx % 5]:
             persons[0] += 1
 
+        # problems = [1, 3, 2, 4, 2]
+        #             2, 1, 2, 3, 2
+        #             0, 0, 1, 0, 1
         if idx % 2 == 0 and val == 2:
             persons[1] += 1
-        elif idx % 2 == 1 and val == pattern_2[idx % 4]:
+        elif idx % 2 == 1 and val == pattern_2[math.floor(idx / 2) % 4]:
             persons[1] += 1
 
         if val == pattern_3[math.floor(idx / 2)]:
@@ -36,6 +39,6 @@ def solution(answers):
 
 
 if __name__ == "__main__":
-    problems = [1, 2, 1, 2, 2]
+    problems = [1, 3, 2, 4, 2]
     ans = solution(problems)
     print(ans)
