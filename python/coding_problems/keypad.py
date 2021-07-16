@@ -1,11 +1,11 @@
 def check_distance(start_num, end_num):
     if start_num % 3 == 2:
         # already in middle line
-        return abs(end_num - start_num) / 3
+        return abs(end_num - start_num)
     elif start_num % 3 == 1:
-        return 1 + abs(start_num + 1 - end_num) / 3
+        return abs(start_num + 1 - end_num)
     else:
-        return 1 + abs(start_num - 1 - end_num) / 3 
+        return abs(start_num - 1 - end_num)
 
 
 def solution(numbers, hand):
