@@ -14,6 +14,12 @@ FP journey will be used to create future data pipelines and CLI programs etc. Sp
 
 CLI programs will also be designed with FP method so that in the future modularity can be considered.
 
+## Programming Language
+
+There are programming languages that are designed for FP. But any language can use concepts from FP.
+
+For this journey, I will be using Scala
+
 ## Books
 
 - [Functional Programming in Scala (by Paul Chiusano and Runar Bjarnason)](https://www.manning.com/books/functional-programming-in-scala)
