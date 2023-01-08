@@ -24,3 +24,8 @@ For this journey, I will be using Scala
 
 - [Functional Programming in Scala (by Paul Chiusano and Runar Bjarnason)](https://www.manning.com/books/functional-programming-in-scala)
 - [Grokking Simplicity (by Eric Normand)](https://grokkingsimplicity.com/)
+
+
+## References
+
+- For exercise answers and notes on Functional Programming in Scala go to [github repository](https://github.com/fpinscala/fpinscala)
