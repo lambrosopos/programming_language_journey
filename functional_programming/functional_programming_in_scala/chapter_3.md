@@ -42,3 +42,17 @@ In `trait List[+A]`, the `+` is a variance annotation that signals that `A` is a
 
 Companion Objects
 A companion object is just an object with the same name as the data type where we put various convenience functions for creating or working with values of the data type.
+
+## 3.2 Pattern Matching
+
+Looking deeper into functions `sum` and `product`.
+
+Sum function
+- Sum of an empty list => 0
+- Sum of a nonempty list => first element + sum of remaining elements
+
+Product function
+- Product of an empty list => 1.0
+- Product of any list starting with 0.0 => 0.0
+- Product of any other nonempty list => first element multiplied by product of remaining elements
+
