@@ -56,3 +56,18 @@ Product function
 - Product of any list starting with 0.0 => 0.0
 - Product of any other nonempty list => first element multiplied by product of remaining elements
 
+
+### Companion Objects
+
+Companion object is an object with the same name as the data type where various conveninence functions for creating or working with values of the data type are stored.
+
+For example, a function
+
+```scala
+def fill[A](n: Int, a: A): List[A]
+```
+
+that created a `List` with `n` copies of the element `a` the `List` companion object will be the right place to put them.
+
+In scala, companion objects are more of a convention. The naming could have been different and be named `Foo` but calling it `List` makes it clear that the module contains functions relevant to working with lists.
+
