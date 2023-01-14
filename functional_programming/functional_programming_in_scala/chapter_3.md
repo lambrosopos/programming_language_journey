@@ -56,6 +56,7 @@ Product function
 - Product of any list starting with 0.0 => 0.0
 - Product of any other nonempty list => first element multiplied by product of remaining elements
 
+A pattern matches the target if there exists an assignment of variables in the pattern to subexpressions of the target that make it structurally equivalent to the target.
 
 ### Companion Objects
 
@@ -70,4 +71,41 @@ def fill[A](n: Int, a: A): List[A]
 that created a `List` with `n` copies of the element `a` the `List` companion object will be the right place to put them.
 
 In scala, companion objects are more of a convention. The naming could have been different and be named `Foo` but calling it `List` makes it clear that the module contains functions relevant to working with lists.
+
+### Exercise 3.1
+
+Result of the following match expression?
+
+```scala
+val x = List(1, 2, 3, 4, 5) match {
+  case Cons(x, Cons(2, Cons(4, _))) => x
+  case Nil => 42
+  case Cons(x, Cons(y, Cons(3, Cons(4, _)))) => x + y
+  case _ => 101
+}
+```
+
+Answer:
+- First case of `Cons(x, Cons(2, Cons(4, _))) => x` doesn't match because of `3` isn't part of the structure.
+- case `Nil` doesn't match since given target is not `Nil`
+- 3rd case will match since `_` will include a structure of `Cons(5, Nil)`. So the answer will be 1 + 2 => 3
+- Since 3rd case matches, it won't progress to 4th case. Otherwise it would have resulted in 101.
+
+### Variadic functions
+
+Function `apply` in the `object List` is a variadic function, meaning it accepts zero or more arguments of type `A`.
+
+```scala
+def apply[A](as: A*): List[A] =
+  if (as.isEmpty) Nil
+  else Cons(as.head, apply(astail: _*))
+```
+
+The special `_*` notation allows to pass a `Seq` to a variadic method
+
+## 3.3 Data Sharing in functional data structures
+
+Question: How to write functions that add or remove elements from a list?
+Answer: Return a new list
+
 
