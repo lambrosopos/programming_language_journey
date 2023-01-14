@@ -108,4 +108,6 @@ The special `_*` notation allows to pass a `Seq` to a variadic method
 Question: How to write functions that add or remove elements from a list?
 Answer: Return a new list
 
+When adding an element 1 to the front of an existing list, say `xs`, a new list is returned. Here, there it becomes `Cons(1, xs)`. Since lists are immutable, the `xs` isn't actually copied, only reused. This is called data sharing.
 
+Same goes for the removal of an item in a list. We don't really need to copy the list since the list is immutable. Simply referring to the tail of the list, exclusing the head allows the ability to create a list without inefficient copying.
