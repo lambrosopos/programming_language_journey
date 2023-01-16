@@ -16,7 +16,7 @@ case class Cons[+A](head: A, tail: List[A]) extends List[A]
 object List {
   def sum(ints: List[Int]): Int = ints match {
     case Nil => 0
-    case Cons(x, xs)) => x + sum(xs)
+    case Cons(x, xs) => x + sum(xs)
   }
 
   def product(ds: List[Double]): Double = ds match {
@@ -111,3 +111,49 @@ Answer: Return a new list
 When adding an element 1 to the front of an existing list, say `xs`, a new list is returned. Here, there it becomes `Cons(1, xs)`. Since lists are immutable, the `xs` isn't actually copied, only reused. This is called data sharing.
 
 Same goes for the removal of an item in a list. We don't really need to copy the list since the list is immutable. Simply referring to the tail of the list, exclusing the head allows the ability to create a list without inefficient copying.
+
+### Exercise 3.2
+
+Implement the function `tail` for removing the first element of a `List`
+
+```scala
+def tail[A](l: List[A]): List[A] = l match 
+  case Nil => sys.error("tail of empty list")
+  case Cons(_, t) => t
+```
+
+### Exercise 3.3
+
+Implement function `setHead` for replacing first element of a `List` with a different value
+
+```scala
+def setHead[A](l: List[A], h: A): List[A] = l match
+  case Nil => sys.error("can't set head of an empty list")
+  case Cons(_, ab) => Cons(h, ab)
+```
+
+### Exercise 3.4
+
+Generalize `tail` to the function `drop`, which removes first `n` elements from a list. Takes time only proportional to the number of elements being dropped. Don't copy the entire `List`.
+
+```scala
+def drop[A](l: List[A], n: Int): List[A] = {
+  if n <= 0 then l
+  else l match
+    case Nil => Nil
+    case Cons(_, t) => drop(t, n - 1)
+}
+```
+
+### Exercise 3.5
+
+Implement `dropWhile` remove elements from the `List` prefix as long as they match a predicate.
+
+```scala
+def dropWhile[A](l: List[A], f: A => Boolean): List[A] =
+  l match
+    case Cons(h, t) if f(h) => dropWhile(t, f)
+    case _ => l
+```
+
+To illustrate the pattern guard, the condition implements an if statement after the case statment which can use any of the variables declared in the case.
