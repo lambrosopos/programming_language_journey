@@ -1,10 +1,10 @@
-object hello {
-  def Main(): Unit = {
-    println("hello world")
-  }
-
-  println("bye world")
+def faillinFn(i: Int): Int = {
+    val y: Int = throw new Exception("fail!")
+    try {
+        val x = 42 + 5
+        x + y
+    }
+    catch { case e: Exception => 43 }
 }
 
-val h = hello
-h.Main()
+faillinFn(12)
