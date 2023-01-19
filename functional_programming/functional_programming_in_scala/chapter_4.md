@@ -104,3 +104,11 @@ def mean(xs: Seq[Double]): Option[Double] =
 ```
 
 Since we still return a type `Option[Double]` even when the list is empty, `mean` is now a total function. 
+
+## 4.4 The Either data type
+
+The concept of handling errors in functional programming is to handle them using ordinary values, also using common patterns of error handling and recovery.
+
+`Option` is not the only option we can use. And while it is available, it is quite simplistic. One characteristic about using `Option` is that it doesn't tell you about the actual error, only returning a `None` value.
+
+Sometimes when just knowing that a failure occurred is sufficient, an `Option` data type is enough. However, when figuring out the reason for the failure, we can use an `Either` data type.
