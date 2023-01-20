@@ -112,3 +112,24 @@ The concept of handling errors in functional programming is to handle them using
 `Option` is not the only option we can use. And while it is available, it is quite simplistic. One characteristic about using `Option` is that it doesn't tell you about the actual error, only returning a `None` value.
 
 Sometimes when just knowing that a failure occurred is sufficient, an `Option` data type is enough. However, when figuring out the reason for the failure, we can use an `Either` data type.
+
+### Either data type definition
+
+`Either` has only two cases, just like `Option`. Unlike `Option`, both cases for `Either` data type carries a value. The values can be said to be a disjoint union of two types.
+
+The two cases can be expressed as `Left` or `Right` cases, where the right value is expressed using `Right` as a pun.
+
+Both `Option` and `Either` data types are included in the Scala standard library since they are used quite commonly.
+
+Let's look into the `mean` example again, this time with `Either` data type.
+
+```scala
+def mean(xs: IndexedSeq[Double]): Either[String, Double] =
+  if (xs.isEmpty)
+    Left("Mean of empty List")
+  else
+    Right(xs.sum / xs.length)
+```
+
+The above example shows the basic usage of `Either` data type. `Either[String, Double]` represents the type to be returned. When available, the `Double` data type is returned while with an error, `String` data type is returned.
+
