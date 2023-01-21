@@ -133,3 +133,32 @@ def mean(xs: IndexedSeq[Double]): Either[String, Double] =
 
 The above example shows the basic usage of `Either` data type. `Either[String, Double]` represents the type to be returned. When available, the `Double` data type is returned while with an error, `String` data type is returned.
 
+Let's look into another example.
+
+Sometimes, when more information is needed, for example, a stack trace, we can also return the Exception itself in the `Left` side of `Either`.
+
+```scala
+def safeDiv(x: Int, y: Int): Either[Exception, Int] = 
+  try Right(x / y)
+  catch { case e: Exception => Left(e) }
+```
+
+Since the `try... catch` pattern is very common, we can create a `Try` function to handle such patterns.
+
+```scala
+def Try[A](a: => A): Either[Exception, A] =
+  try Right(a)
+  catch { case e: Exception => Left(e) }
+```
+
+And by using the above two examples, we can now write out the function as such.
+
+```scala
+def parseInsuranceRateQuote(
+  age: String,
+  numberOfSpeedingTickets: String): Either[Exception, Double] = 
+    for {
+      a <- Try { age.toInt }
+      tickets <- Try { numberOfSpeedingTickets.toInt }
+    } yield insuranceRateQuote(a, tickets)
+```
