@@ -162,3 +162,7 @@ def parseInsuranceRateQuote(
       tickets <- Try { numberOfSpeedingTickets.toInt }
     } yield insuranceRateQuote(a, tickets)
 ```
+
+## Summary
+
+The biggest idea in FP in handling errors is to represent them using ordinary values and use higher-order functions to hande common patterns.
