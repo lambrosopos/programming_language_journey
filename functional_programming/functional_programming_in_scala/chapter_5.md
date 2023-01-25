@@ -25,3 +25,27 @@ A manual expression of the steps that will be taken is as follows.
 
 Looking at this, although we can replace the intermediary List data structures for each step, wouldn't it be nicer if one can progress through the list without such results?
 
+## 5.1 Strict and non-strictness
+
+What is strictness?
+
+Strictness in a function can be defined as evaluating the arguments passed to a function right away. Depending on the language, strictness is sometimes enforced. For scala, unless told otherwise, any function defined will be strict.
+
+For example,
+
+Receiving a code such as `square(41.0 + 1.0)` the function will evaluate `41.0 + 1.0` before the function operates. Same goes for `square(sys.error('failure'))`, scala will raise a system error with a 'failure' message before the function even has a chance to operate. This is because it is strict. It will evalute its arguments right away.
+
+Some examples of strictness is the `&&` and `||` operators. Using these operators, one can use a short circuit concept to not evaluate the latter value.
+
+Another example is the `if` statement which also doesn't evaluate depending on the condition. To be clear, the `if` statement is strict in terms of evaluating the conditions.
+
+Let's look at the non-strict function syntax
+
+```scala
+def if2[A](cond: Boolean, onTrue: () => A, onFalse: () => A): A =
+    if (cond) onTrue() else onFalse()
+```
+
+The above example is a basic example of creating a non-strict function in scala. In the upcoming examples, there will be a better example that sugarcoats this concept.
+
+
