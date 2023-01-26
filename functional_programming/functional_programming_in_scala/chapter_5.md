@@ -44,8 +44,27 @@ Let's look at the non-strict function syntax
 ```scala
 def if2[A](cond: Boolean, onTrue: () => A, onFalse: () => A): A =
     if (cond) onTrue() else onFalse()
+
+if2(a < 22,
+    () => println("a"),
+    () => println("b")
+)
 ```
 
 The above example is a basic example of creating a non-strict function in scala. In the upcoming examples, there will be a better example that sugarcoats this concept.
 
+In general, the unevaluated form of an expression is called a thunk. And we can force a thunk to evaluate the expression and get a result. Here, an anonymous function without arguments is passed as a thunk to be evaluated.
 
+However the above example is so common that scala has a syntax for such behavior. Thus the above code can be rewritten as such.
+
+```scala
+def if2[A](cond: Boolean, onTrue: => A, onFalse: => A): A =
+    if (cond) onTrue else onFalse
+```
+
+There are two differences.
+
+1. The arrow `=>` is shown right after the type instead of `() =>`
+2. The thunks are simply referenced instead of being called. `onTrue` instead of `onTrue()`
+
+Scala takes care of the inner workings when using such syntax.
