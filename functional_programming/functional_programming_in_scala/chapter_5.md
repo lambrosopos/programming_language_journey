@@ -68,3 +68,37 @@ There are two differences.
 2. The thunks are simply referenced instead of being called. `onTrue` instead of `onTrue()`
 
 Scala takes care of the inner workings when using such syntax.
+
+For either above examples, the arguments will be evaluated once for each place it's refernced. However, evaluating for each time it's referenced is a waste and scala can improve this by using a lazy evaluation.
+
+For example,
+
+```scala
+def maybeTwice(b: Boolean, i: => Int) =
+    if (b) i + i 
+    else 0
+
+scala> val x = maybeTwice(true, { println("hi"); 41 + 1 })
+hi
+hi
+x: Int = 84
+```
+
+Here, you can see that the expression `print("hi"); 41 + 1` that is passed as `i` is evaluated twice. The print statement comes out twice which also means that `41 + 1` is also evaluated twice.
+
+Using `lazy` keyword, we can improve this.
+
+```scala
+def maybeTwice2(b: Boolean, i: => Int) =
+    lazy val j = i
+    if  (b) j + j
+    else 0
+
+scala val x = maybeTwice2(true, { println("hi"); 41 + 1 })
+hi
+x: Int = 84
+```
+
+Adding the `lazy` keyword in front of the variable declaration does the following things:
+ - Cause scala to delay evaluation of the right-hand side of that `lazy val` decalaration until it's first referneced.
+ - Cache the result so that subsequent references to it don't trigger repeated evaluation.
