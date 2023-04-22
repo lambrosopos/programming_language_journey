@@ -14,7 +14,7 @@ int main(void)
         error_handling("open() error!");
     printf("file descriptor : %d \n", fd);
 
-    if(write(fd, buf, sizeof(buf))==1)
+    if(write(fd, buf, sizeof(buf))==-1)
         error_handling("write() error!");
 
     close(fd);
