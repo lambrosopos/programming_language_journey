@@ -17,14 +17,14 @@ int main(int argc, char *argv[])
 
     char message[]="Hello World!";
 
-    if(argc!=2)
+    if(argc != 2)
     {
         printf("Usage : %s <port>\n", argv[0]);
         exit(1);
     }
 
     serv_sock = socket(PF_INET, SOCK_STREAM, 0);
-    if(serv_sock==-1)
+    if(serv_sock == -1)
         error_handling("socket() error");
 
     memset(&serv_addr, 0, sizeof(serv_addr));
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     if(bind(serv_sock, (struct sockaddr*) &serv_addr, sizeof(serv_addr)) == -1)
         error_handling("bind() error");
     
-    if(listen(serv_sock, 5)==-1)
+    if(listen(serv_sock, 5) == -1)
         error_handling("listen() error");
 
     clnt_addr_size = sizeof(clnt_addr);
