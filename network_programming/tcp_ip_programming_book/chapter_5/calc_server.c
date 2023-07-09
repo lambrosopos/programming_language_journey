@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <arpa.inet.h>
+#include <arpa/inet.h>
 #include <string.h>
 #define BUF_SIZE 1024
 
