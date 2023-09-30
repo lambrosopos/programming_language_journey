@@ -1,0 +1,4 @@
+hello
+my name is rabbit
+bye
+hello again
