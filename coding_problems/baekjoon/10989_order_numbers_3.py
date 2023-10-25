@@ -1,10 +1,12 @@
-total_len = int(input())
+import sys
 
-num_list = [0] * total_len
-for i in range(total_len):
-    num_list[i] = int(input())
+N  = int(sys.stdin.readline())
+arr = [0]*10001
 
-num_list.sort()
+for _ in range(N):
+    num = int(sys.stdin.readline())
+    arr[num] += 1
 
-for n in num_list:
-    print(n)
+for i in range(10001): 
+    if arr[i] != 0:
+    	print(f"{i}\n" * arr[i], end="")
