@@ -5,46 +5,33 @@ const float wWidth = 400;
 const float wHeight = 200;
 const std::string wTitle = "SFML Works!";
 
-
-void init() 
-{
-}
-
-void update(sf::RenderWindow& window)
-{
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
-}
-
-void draw(sf::RenderWindow& window, sf::CircleShape& shape)
-{
-        window.clear();
-        window.draw(shape);
-        window.display();
-}
-
-int main()
-{
-    sf::RenderWindow window(sf::VideoMode(wWidth, wHeight), wTitle);
-    sf::CircleShape shape(100.f);
-    sf::CircleShape shape_2(20.f);
-
-    shape.setFillColor(sf::Color::Green);
-    shape_2.setFillColor(sf::Color::Yellow);
-    shape_2.setOutlineColor(sf::Color::Blue);
-    shape_2.setPosition(wWidth / 2 - 20, wHeight / 2 - 20);
-
-    while (window.isOpen())
-    {
-	update(window);
-	draw(window, shape_2);
-
+// Only operate on transform components
+void sMovement(std::vector<Entity>& entities) {
+    for (auto& e : entities) {
+        e.cTransform->pos += e.cTransform->velocity;
     }
-
-    return 0;
 }
 
+
+void doStuff(std::vector<Entity>& entities) {
+    for (auto& e : entities) {
+        e.cTransform->pos += e.cTransform->velocity;
+        e.cShape->shape.setPosition(e.cTransform->pos);
+        window.draw(e.cShape->shape);
+    }
+}
+
+
+// Main Game Loop with ECS
+int main() {
+    // Shared pointer will be false if not present
+    std::vector<Entity> entities;
+    Vec2 p(100, 200), v(10, 10);
+    Entity e;
+    e.cTransform = std::make_shared<Ctransform>(p, v);
+    e.cName = std::make_shared<cName>("Red Box");
+    e.cShape = std::make_shared<CShape> (args);
+
+    entities.push_back(e);
+    doStuff(entities);
+}
