@@ -45,6 +45,7 @@ def bfs(x: int, y: int, board: list[list[int]], tracked: list[list[int]]):
             else:
                 tracked[ni][nj] = min(tracked[ni][nj], 1 + tracked[i][j])
 
+# If there's a 1 in other square, it doesn't matter, since starting from 0, 0
 bfs(x=0, y=0, board=board, tracked=tracked)
 
 print(tracked[H - 1][W - 1])
