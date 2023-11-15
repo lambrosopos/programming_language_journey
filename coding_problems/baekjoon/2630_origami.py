@@ -1,45 +1,48 @@
 import sys
-sys.setrecursionlimit(10_000)
 
 N = int(sys.stdin.readline())
 
-board = []
-for _ in range(N):
-    numbers = list(map(int, sys.stdin.readline().split()))
-    board.append(numbers)
+board = [ list(map(int, sys.stdin.readline().split())) for _ in range(N) ]
 
-BLUE, WHITE = 0, 0
-def dnc(coords: tuple[int, int], board_len: int):
-    global BLUE, WHITE
+def dnc(coord: tuple[int, int], len_n: int) -> tuple[int, int]:
+    """
+    Receives the starting upper left coordinates and the length it should search for
 
-    start_color = board[coords[0]][coords[1]]
-    all_same = True
-    for i in range(coords[1], coords[0] + board_len):
-        if all_same is False:
-            break
-        for j in range(coords[0], coords[1] + board_len):
-            if all_same is False:
+    Coordinates is a tuple of i and j, where i is height (y) and j is width (x)
+
+    Returns:
+         - tuple of two integers, blue and white respectively (blue = 1, white = 0)
+    """
+    first_val = board[coord[0]][coord[1]]
+
+    # Check if all the values of given board is the same
+    is_same = True
+    for i in range(coord[0], coord[0] + len_n):
+        for j in range(coord[1], coord[1] + len_n):
+            if board[i][j] != first_val:
+                is_same = False
                 break
-            if board[i][j] != start_color:
-                all_same = False
 
-    print(f"{all_same=}, {coords=}, {BLUE=}, {WHITE=}, {board_len=}")
-    
-    if all_same:
-        if start_color == 0:
-            WHITE += 1 
-        else: 
-            BLUE += 1 
-    else:
-        half_len = board_len // 2 
-        dnc(coords, half_len) 
-        dnc((half_len, half_len), half_len)
-        dnc((coords[0], half_len), half_len)
-        dnc((half_len, coords[1]), half_len)
+    if is_same:
+        return (0, 1) if first_val == 0 else (1, 0)
 
+    # If not the same, split board into four, and repeat process
+    new_len = len_n // 2
 
+    b, w = 0, 0
 
-dnc((0, 0), N)
+    b1, w1 = dnc((coord[0], coord[1] + new_len), new_len) # Quadrant I
+    b2, w2 = dnc(coord, new_len) # Quadrant II
+    b3, w3 = dnc((coord[0] + new_len, coord[1]), new_len) # Quadrant III
+    b4, w4 = dnc((coord[0] + new_len, coord[1] + new_len), new_len) # Quadrant IV
 
-print(BLUE)
-print(WHITE)
+    b += b1 + b2 + b3 + b4
+    w += w1 + w2 + w3 + w4
+
+    return (b, w)
+
+b, w= dnc((0, 0), N)
+
+print(w)
+print(b)
+
