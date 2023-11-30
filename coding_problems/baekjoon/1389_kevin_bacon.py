@@ -1,47 +1,61 @@
 import sys
-from collections import deque
+import heapq
 
 num_nodes, num_edges = map(int, sys.stdin.readline().split())
-num_nodes += 1
-
-nodes = [ list() for _ in range(num_nodes) ]
 
 
-for i in range(num_edges):
-    A, B = map(int, sys.stdin.readline().split())
-    nodes[A].append(B)
-    nodes[B].append(A)
+# Will use djikstra's algorithm to find the shortest path to all.
 
-kb_score = [0] * num_nodes
+# Initialize adjacent edges
+adj = {}
+for i in range(1, num_nodes + 1):
+    adj[i] = []
 
-def get_score(node: int):
-    global nodes
+for _ in range(num_edges):
+    from_node, to_node = map(int, sys.stdin.readline().split())
 
-    scores = [1e9] * num_nodes
+    # Attach a double edge for going from and to
+    adj[from_node].append((1, to_node))
+    adj[to_node].append((1, from_node))
 
-    scores[0] = 0
-    scores[node] = 0
+def djikstra(node: int) -> int:
+    """
+    Return a number which is the sum of the cost to travel to edges.
+    """
+    distances = [-1] * (num_nodes + 1)
+    # revert first index to zero, since will not be using it.
+    distances[0] = 0
 
-    queue = deque([node])
-    while len(queue) > 0:
-        cur_node = queue.popleft()
+    heap = []
+    heapq.heappush(heap, (0, node))
 
-        cur_score = scores[cur_node] + 1
-        for n in nodes[cur_node]:
-            if cur_score <= scores[n]:
-                queue.append(n)
-                scores[n] = min(cur_score, scores[n])
+    while len(heap) > 0:
+        cur_weight, cur_node = heapq.heappop(heap)
 
-    return sum(scores)
+        if distances[cur_node] != -1:
+            continue
 
-for i in range(1, num_nodes):
-    kb_score[i] = get_score(i)
+        # Establish current weight for the current node
+        distances[cur_node] = cur_weight
 
-lowest_score = kb_score[1]
-lowest_idx = 1
-for i in range(1, num_nodes):
-    if kb_score[i] < lowest_score:
-        lowest_score = kb_score[i]
-        lowest_idx = i
+        for next_weight, next_node in adj[cur_node]:
+            if distances[next_node] == -1:
+                heapq.heappush(heap, (cur_weight + next_weight, next_node))
 
-print(lowest_idx)
+    return sum(distances)
+
+
+scores = []
+for node in range(1, num_nodes + 1):
+    # add the individual scores
+    score = djikstra(node)
+    scores.append(score)
+
+
+# Get the idx for the minimum score.
+min_idx = 0
+for i in range(num_nodes):
+    if scores[i] < scores[min_idx]:
+        min_idx = i
+
+print(min_idx + 1)
