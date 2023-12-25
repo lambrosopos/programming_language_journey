@@ -2,11 +2,13 @@ import sys
 
 N, M = map(int, sys.stdin.readline().split())
 
-"""
-print 1 for M times.
-print 2 for M - 1 times.
-print 3 for M - 2 times.
-"""
+def print_sequence(start_i, sequence: str):
+    if len(sequence) == (2 * M - 1):
+        print(sequence)
+        return
 
-def print_recur(start, end, count):
-    for i in range(start, end + 1
+    for j in range(start_i, N + 1):
+        print_sequence(j + 1, f"{sequence} {j}")
+
+for i in range(1, N - M + 2):
+    print_sequence(i + 1, f"{i}")
