@@ -5,18 +5,30 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+
 #define BUF_SIZE 1024
+#define OPSZ 4
 
 void error_handling(char *message);
+int calculate(int opnum, int opnds[], char operator);
 
 int main(int argc, char* argv[])
 {
   // Basic server info
   int serv_sock;
   int clnt_sock;
-  socklen_t clnt_sock_size;
+  socklen_t clnt_adr_size;
   struct sockaddr_in serv_addr;
   struct sockaddr_in clnt_addr;
+
+  // Operator information
+  int i;
+  int opnd_cnt;
+  int recv_len;
+  int recv_cnt;
+  int result;
+  char operator;
+  char opinfo[BUF_SIZE];
 
   if(argc != 2) {
     printf("Usage : %s <PORT>\n", argv[0]);
@@ -38,16 +50,28 @@ int main(int argc, char* argv[])
     printf("binded to %d:%d\n", INADDR_ANY, atoi(argv[1]));
   }
 
-  if(listen(serv_sock, 5) == -1) {
-    error_handling("listen() error");
-  } else {
-    printf("Listening on port %s\n", argv[1]);
+  if(listen(serv_sock, 5) == -1) { error_handling("listen() error"); } else { printf("Listening on port %s\n", argv[1]);
   }
 
-  clnt_sock_size=sizeof(clnt_sock_size);
-  clnt_sock=accept(serv_sock, (struct sockaddr*) &clnt_addr, &clnt_sock_size);
+  clnt_adr_size=sizeof(clnt_addr);
 
-  write(clnt_sock, "hello\n", sizeof("hello\n"));
+  for(i=0; i<5; i++) {
+    opnd_cnt=0;
+    clnt_sock=accept(serv_sock, (struct sockaddr*) &clnt_addr, &clnt_adr_size);
+    read(clnt_sock, &opnd_cnt, 1);
+
+    recv_len=0;
+
+    // 여기에서 operator 까지 읽어오기
+    while(recv_len < (opnd_cnt*OPSZ+1)) { 
+      recv_cnt = read(clnt_sock, &opinfo[recv_len], BUF_SIZE-1);
+      recv_len += recv_cnt;
+    }
+
+    result=calculate(opnd_cnt, (int*)opinfo, opinfo[recv_len-1]);
+    write(clnt_sock, &result, sizeof(result));
+    close(clnt_sock);
+  }
 
   close(serv_sock);
   printf("Closed server\n");
@@ -61,3 +85,20 @@ void error_handling(char *message)
     exit(1);
 }
 
+int calculate(int opnum, int opnds[], char op) {
+  int result = opnds[0];
+  int i;
+  switch(op) {
+    case '+':
+      for(i=1; i<opnum; i++) result+=opnds[i];
+      break;
+    case '*':
+      for(i=1; i<opnum; i++) result*=opnds[i];
+      break;
+    case '-':
+      for(i=1; i<opnum; i++) result-=opnds[i];
+      break;
+  }
+
+  return result;
+}

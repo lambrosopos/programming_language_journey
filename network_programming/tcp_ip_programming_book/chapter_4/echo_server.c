@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <netinet/in.h>
-#include <string.h>
-#include <sys/socket.h>
+#include <string.h> #include <sys/socket.h>
 #include <unistd.h>
 
 #define BUF_SIZE 5
