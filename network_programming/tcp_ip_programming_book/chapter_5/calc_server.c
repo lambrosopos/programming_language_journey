@@ -50,7 +50,10 @@ int main(int argc, char* argv[])
     printf("binded to %d:%d\n", INADDR_ANY, atoi(argv[1]));
   }
 
-  if(listen(serv_sock, 5) == -1) { error_handling("listen() error"); } else { printf("Listening on port %s\n", argv[1]);
+  if(listen(serv_sock, 5) == -1) {
+    error_handling("listen() error");
+  } else {
+    printf("Listening on port %s\n", argv[1]);
   }
 
   clnt_adr_size=sizeof(clnt_addr);
