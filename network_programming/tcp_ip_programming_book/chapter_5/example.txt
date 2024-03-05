@@ -1,0 +1,4 @@
+This is an example text file.
+It has 2 lines.
+
+Actually has 4
