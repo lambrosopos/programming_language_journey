@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
   while(1) {
     clnt_addr_sz=sizeof(clnt_addr);
     recvfrom(serv_sock, message, BUF_SIZE-1, 0, (struct sockaddr*) &clnt_addr, &clnt_addr_sz);
-    sendto(serv_sock, "hello", 5, 0, (struct sockaddr*) &clnt_addr, clnt_addr_sz);
+    sendto(serv_sock, message, strlen(message), 0, (struct sockaddr*) &clnt_addr, clnt_addr_sz);
   }
 
   close(serv_sock);
