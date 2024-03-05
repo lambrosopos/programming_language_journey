@@ -20,9 +20,6 @@ int main(int argc, char *argv[]) {
   struct sockaddr_in clnt_addr;
   socklen_t clnt_addr_sz;
 
-  int recv_cnt;
-  int recv_len;
-  int filename_sz;
   char filename[FILENAME_SIZE];
 
   // File operations
@@ -58,26 +55,22 @@ int main(int argc, char *argv[]) {
     clnt_sock=accept(serv_sock, (struct sockaddr*) &clnt_addr, &clnt_addr_sz);
     printf("Connected to client...\n");
 
-    // Need filename size using single byte => 2**8
-    filename_sz=0;
-    read(clnt_sock, &filename_sz, 1);
-
     // Get filename string
-    recv_len=0;
-    while(recv_len < filename_sz-1) {
-      recv_cnt=read(clnt_sock, &filename, filename_sz);
-      recv_len+=recv_cnt;
-    }
+    read(clnt_sock, filename, FILENAME_SIZE);
 
-    printf("Received filename size : %d\n", filename_sz);
     printf("Received filename : %s\n", filename);
 
+    int line_cnt;
     if((file_ptr=fopen(filename, "r"))==NULL){
-      printf("No file\n");
+      printf("File not found: %s\n", filename);
     } else {
-      while(fgets(line, BUF_SIZE, file_ptr) != NULL) {
-        printf("Sending line: %s\n", line);
-        write(clnt_sock, line, BUF_SIZE);
+      while(1) {
+        line_cnt=fread(line, 1, BUF_SIZE, file_ptr);
+        if(line_cnt<BUF_SIZE) {
+          write(clnt_sock, line, line_cnt);
+          break;
+        }
+        write(clnt_sock, line, line_cnt);
       }
     }
 

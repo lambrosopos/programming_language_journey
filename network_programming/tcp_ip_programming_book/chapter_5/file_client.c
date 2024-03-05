@@ -19,11 +19,12 @@ int main(int argc, char *argv[]) {
   int filename_sz;
   struct sockaddr_in serv_addr;
 
+  int read_cnt;
   char filename[FILENAME_SZ];
   char line[BUF_SIZE];
 
-  if(argc != 4) {
-    printf("Usage : %s <ip> <port> <filename>", argv[0]);
+  if(argc != 3) {
+    printf("Usage : %s <ip> <port>", argv[0]);
   }
 
   sock=socket(PF_INET, SOCK_STREAM, 0);
@@ -39,18 +40,16 @@ int main(int argc, char *argv[]) {
     printf("Connected to %s:%s\n", argv[1], argv[2]);
   }
 
-  filename_sz=strlen(argv[3]);
+  printf("Enter filename : ");
+  scanf("%s", filename);
+  printf("\n");
 
-  filename[0]=(char)filename_sz;
-  // strcat(filename, argv[3]);
-  strcat(filename, "example.txt");
-  printf("%lu\n", strlen("."));
-  printf("%d: %s\n", filename_sz + 1, filename);
-  write(sock, filename, filename_sz + 1);
+  write(sock, filename, strlen(filename)+1);
 
-  while(read(sock, line, BUF_SIZE-1) != 0) {
+  while((read_cnt=read(sock, line, BUF_SIZE) != 0)) {
     printf("%s", line);
   }
 
   close(sock);
+  return 0;
 }
