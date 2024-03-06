@@ -32,6 +32,20 @@ int main(int argc, char *argv[]) {
   serv_addr.sin_addr.s_addr=inet_addr(argv[1]);
   serv_addr.sin_port=htons(atoi(argv[2]));
 
+  // UDP sockets are unconnected by default.
+  // Unconnected sockets register IP and PORT info on sendto
+  // They also remove registered information after sendto is finished.
+  //
+  // This operation takes around 30% of resources.
+  //
+  // Connected sockets register IP and PORT to a socket, so the above process doesn't get repeated.
+  //
+  // This is useful when UDP sockets are contacting same host.
+  
+  if(connect(sock, (struct sockaddr*) &serv_addr, sizeof(serv_addr)) == -1) {
+    error_handling("connect() error");
+  }
+
   while(1) {
     fputs("Insert message (q to quit) : ", stdout);
     fgets(message, sizeof(message), stdin);
@@ -40,9 +54,17 @@ int main(int argc, char *argv[]) {
       break;
     }
 
+    // Unconnected UDP sockets.
+    /*
     sendto(sock, message, strlen(message), 0, (struct sockaddr*) &serv_addr, sizeof(serv_addr));
     addr_sz=sizeof(from_addr);
     str_len=recvfrom(sock, message, BUF_SIZE, 0, (struct sockaddr*) &from_addr, &addr_sz);
+    */
+
+    // Connected sockets can simply use read/write since destinations are fixed.
+    write(sock, message, strlen(message));
+    read(sock, message, BUF_SIZE);
+
 
     message[str_len]=0;
     printf("Message from server : %s\n", message);
