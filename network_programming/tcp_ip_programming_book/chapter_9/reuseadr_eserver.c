@@ -1,3 +1,4 @@
+#include <asm-generic/socket.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -7,6 +8,8 @@
 #include <unistd.h>
 
 #define BUF_SIZE 1024
+#define TRUE 1
+#define FALSE 0
 
 void error_handling(char *message) {
   fputs(message, stderr);
@@ -23,12 +26,26 @@ int main(int argc, char *argv[]) {
   int i;
   int read_cnt;
 
+  int state;
+  int optval;
+  socklen_t optlen;
+
   if(argc != 2) {
     printf("Usage : %s <PORT>\n", argv[0]);
     exit(1);
   }
 
   serv_sock=socket(PF_INET, SOCK_STREAM, 0);
+  if(serv_sock == -1) {
+    error_handling("socket() error");
+  }
+
+  optlen=sizeof(optval);
+  optval=TRUE;
+  state=setsockopt(serv_sock, SOL_SOCKET, SO_REUSEADDR, (void *) &optval, optlen);
+  if(state == -1) {
+    error_handling("setsockopt() error");
+  }
 
   memset(&serv_adr, 0, sizeof(serv_adr));
   serv_adr.sin_family=AF_INET;
@@ -50,9 +67,9 @@ int main(int argc, char *argv[]) {
       error_handling("accept() error");
     }
 
-    while((read_cnt=read(clnt_sock, &message, BUF_SIZE)) != 0) {
+    while((read_cnt=read(clnt_sock, message, BUF_SIZE)) != 0) {
       printf("Received message : %s\n", message);
-      write(clnt_sock, &message, sizeof(message));
+      write(clnt_sock, message, read_cnt);
     }
 
     close(clnt_sock);
