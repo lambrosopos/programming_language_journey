@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
   state=sigaction(SIGURG, &act, 0);
 
   // Regular receiving handling
-  while((str_len=recv(recv_sock, buf, BUF_SIZE, 0)) != 0) {
+  while((str_len=recv(recv_sock, buf, sizeof(buf), 0)) != 0) {
     if(str_len == -1) {
       continue;
     }
