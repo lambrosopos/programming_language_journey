@@ -78,7 +78,7 @@ void urg_handler(int signo) {
   int str_len;
   char buf[BUF_SIZE];
 
-  str_len=recv(recv_sock, buf, BUF_SIZE, MSG_OOB);
+  str_len=recv(recv_sock, buf, sizeof(buf)-1, MSG_OOB);
   buf[str_len]=0;
   printf("Urgent message : %s\n", buf);
 }
