@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
   struct sockaddr_in recv_adr;
 
   if(argc != 3) {
-    printf("Usage : %s\n", argv[0]);
+    printf("Usage : %s <ip> <port>\n", argv[0]);
     exit(1);
   }
 
