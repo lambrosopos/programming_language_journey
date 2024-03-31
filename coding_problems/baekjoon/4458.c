@@ -1,26 +1,22 @@
-#include <stdio.h>
 #include <ctype.h>
+#include <stdio.h>
 
-#define MAX_LINE_SIZE 31
+#define LINE_SIZE 31
+
+void solve();
 
 int main() {
   int N;
   scanf("%d", &N);
-  getchar(); // Consume newline character after reading N
+  getchar();
 
-  // Buffer to store each line
-  char line[MAX_LINE_SIZE];
-
+  char L[LINE_SIZE];
   for (int i = 0; i < N; i++) {
-    fgets(line, MAX_LINE_SIZE, stdin);
+    scanf("%[^\n]%*c", L);
 
-    // Capitalize the first letter of the line
-    if (isalpha(line[0])) {
-      line[0] = toupper(line[0]);
-    }
+    L[0]=toupper(L[0]);
 
-    // Output the modified line
-    printf("%s", line);
+    printf("%s\n", L);
   }
 
   return 0;
