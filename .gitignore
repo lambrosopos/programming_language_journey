@@ -3,3 +3,5 @@
 # VS Code
 .metals/
 .vscode/
+
+golang/go_data_processing/massive.txt

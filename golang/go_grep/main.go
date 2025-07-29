@@ -1,92 +1,142 @@
 package main
 
 import (
-  "os"
   "bufio"
   "fmt"
-  "strings"
+  "os"
   "path/filepath"
+  "strings"
 )
 
-
-type lineInfo struct {
+type LineInfo struct {
   lineNo int
-  lineText string
+  line   string
 }
 
-
-type searchResult struct {
-  filepath string
-  lineInfos []lineInfo
+type FindInfo struct {
+  filename string
+  lines    []LineInfo
 }
 
 func main() {
-  if len(os.Args) != 3 {
-    fmt.Println("Usage : go_grep word filepath")
-    os.Exit(1)
+  if len(os.Args) < 2 {
+    fmt.Println("Usage : $ go_grep word filepaths")
+    return
   }
 
-  filepaths, err := filepath.Glob(os.Args[2])
-  if err != nil {
-    fmt.Println("Error while listing filepaths")
-    os.Exit(1)
+  word := os.Args[1]
+  files := os.Args[2:]
+  
+  findInfos := []FindInfo{}
+  for _, path := range files {
+    findInfos = append(findInfos, ConFindWordInAllFiles(word, path)...)
   }
 
-  searchResults := []searchResult{}
-
-  for _, v := range filepaths {
-    newSearchResult := searchResult{filepath:v, lineInfos:readFile(v)}
-    searchResults = append(searchResults, newSearchResult)
-  }
-
-  totalFinds := 0
-  totalFiles := 0
-  for _, v := range searchResults {
-    if len(v.lineInfos) == 0 {
+  for _, findInfo := range findInfos {
+    if len(findInfo.lines) == 0 {
       continue
     }
 
-    fmt.Println("=================================================")
-    fmt.Println(v.filepath)
-    fmt.Println("-------------------------------------------------")
-    for _, w := range v.lineInfos {
-      fmt.Printf("Line %d : %s\n", w.lineNo, w.lineText)
+    fmt.Println(findInfo.filename)
+    fmt.Println("===========================================")
+    for _, lineInfo := range findInfo.lines {
+      fmt.Println("\n", lineInfo.lineNo, "\t", lineInfo.line)
     }
+    fmt.Println("===========================================")
     fmt.Println()
-
-    totalFinds += len(v.lineInfos)
-    totalFiles += 1
   }
-
-  fmt.Println("-------------------------------------------------")
-  fmt.Printf("Found total %d matching lines from %d files\n", totalFinds, totalFiles)
-  fmt.Println("-------------------------------------------------")
 }
 
-func readFile(filepath string) []lineInfo {
-  fileReader, _ := os.Open(filepath)
-  defer fileReader.Close()
+func GetFileList(path string) ([]string, error) {
+  return filepath.Glob(path)
+}
 
-  fileScanner := bufio.NewScanner(fileReader)
+// func FindWordInAllFiles(word string, path string) []FindInfo {
+//   findInfos := []FindInfo{}
+//
+//   filelist, err := GetFileList(path)
+//   if err != nil {
+//     fmt.Println("Check filepath. err:", err, "path:", path)
+//     return findInfos
+//   }
+//
+//   for _, filename := range filelist {
+//     findInfos = append(findInfos, FindWordInFile(word, filename))
+//   }
+//
+//   return findInfos
+// }
 
-  results := []lineInfo{}
+// func FindWordInFile(word string, filename string) FindInfo {
+//   findInfo := FindInfo{filename, []LineInfo{}}
+//   file, err := os.Open(filename)
+//   if err != nil {
+//     fmt.Println("Unable to open file. ", filename)
+//     return findInfo
+//   }
+//   defer file.Close()
+//
+//   lineNo := 1
+//   scanner := bufio.NewScanner(file)
+//   for scanner.Scan() {
+//     line := scanner.Text()
+//     if strings.Contains(line, word) {
+//       findInfo.lines = append(findInfo.lines, LineInfo{lineNo, line})
+//     }
+//     lineNo++
+//   }
+//
+//   return findInfo
+// }
 
-  idx := 1
-  for {
-    if fileScanner.Scan() == true {
-      curLine := fileScanner.Text()
+func ConFindWordInAllFiles(word string, path string) []FindInfo {
+  findInfos := []FindInfo{}
 
-      if strings.Contains(curLine, os.Args[1]) {
-        newLineInfo := lineInfo{lineNo:idx, lineText:curLine}
-        results = append(results, newLineInfo)
-      }
-    } else {
-      break
-    }
-
-    idx++
+  filelist, err := GetFileList(path)
+  if err != nil {
+    fmt.Println("Check filepath. err:", err, "path:", path)
+    return findInfos
   }
 
-  return results
+  ch := make(chan FindInfo)
+  cnt := len(filelist)
+  recvCnt := 0
+
+  for _, filename := range filelist {
+    go ConFindWordInFile(word, filename, ch)
+  }
+
+  for findInfo := range ch {
+    findInfos = append(findInfos, findInfo)
+    recvCnt++
+    if recvCnt == cnt {
+      break
+    }
+  }
+
+  return findInfos
+}
+
+func ConFindWordInFile(word string, filename string, ch chan FindInfo) {
+  findInfo := FindInfo{filename, []LineInfo{}}
+  file, err := os.Open(filename)
+  if err != nil {
+    fmt.Println("Unable to open file. ", filename)
+    ch <- findInfo
+    return
+  }
+  defer file.Close()
+
+  lineNo := 1
+  scanner := bufio.NewScanner(file)
+  for scanner.Scan() {
+    line := scanner.Text()
+    if strings.Contains(line, word) {
+      findInfo.lines = append(findInfo.lines, LineInfo{lineNo, line})
+    }
+    lineNo++
+  }
+
+  ch <- findInfo
 }
 
