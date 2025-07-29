@@ -141,3 +141,271 @@ func WriteGoThreadsOptimized(filename string, optionalArgs ...int) error {
 	return nil
 }
 
+/ OPTIMIZED VERSION 2: Batch-based approach for even better performance
+func WriteGoThreadsBatched(filename string, optionalArgs ...int) error {
+	totalRows := 10_000
+	batchSize := 1000
+	
+	if len(optionalArgs) > 0 {
+		totalRows = optionalArgs[0]
+	}
+	if len(optionalArgs) > 1 {
+		batchSize = optionalArgs[1]
+	}
+
+	file, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return fmt.Errorf("unable to open %s: %w", filename, err)
+	}
+	defer file.Close()
+
+	writer := bufio.NewWriterSize(file, 128*1024) // 128KB buffer
+	defer func() {
+		if flushErr := writer.Flush(); flushErr != nil {
+			log.Printf("Error flushing writer: %v", flushErr)
+		}
+	}()
+
+	numWorkers := min(runtime.NumCPU()*2, 12)
+	if totalRows < batchSize*2 {
+		numWorkers = 1
+	}
+
+	// Channel for batches instead of individual lines
+	type batch struct {
+		data []byte
+		size int
+	}
+	
+	batchChan := make(chan batch, numWorkers*2)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	var wg sync.WaitGroup
+	writerErr := make(chan error, 1)
+
+	// Single writer goroutine
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var totalWritten int64
+		
+		for {
+			select {
+			case b, ok := <-batchChan:
+				if !ok {
+					fmt.Printf("Batch writer finished. Total lines: %d\n", totalWritten)
+					return
+				}
+				
+				if _, err := writer.Write(b.data); err != nil {
+					writerErr <- fmt.Errorf("batch write error: %w", err)
+					return
+				}
+				totalWritten += int64(b.size)
+				
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+
+	// Calculate batches per worker
+	totalBatches := (totalRows + batchSize - 1) / batchSize
+	batchesPerWorker := totalBatches / numWorkers
+	remainderBatches := totalBatches % numWorkers
+
+	var generatorWg sync.WaitGroup
+
+	for i := 0; i < numWorkers; i++ {
+		generatorWg.Add(1)
+		
+		startBatch := i * batchesPerWorker
+		endBatch := startBatch + batchesPerWorker
+		if i == numWorkers-1 {
+			endBatch += remainderBatches
+		}
+		
+		go func(workerID, startBatch, endBatch int) {
+			defer generatorWg.Done()
+			
+			for batchIdx := startBatch; batchIdx < endBatch; batchIdx++ {
+				select {
+				case <-ctx.Done():
+					return
+				default:
+				}
+				
+				// Calculate rows for this batch
+				startRow := batchIdx * batchSize
+				endRow := min(startRow+batchSize, totalRows)
+				actualBatchSize := endRow - startRow
+				
+				if actualBatchSize <= 0 {
+					continue
+				}
+				
+				// Build batch in memory
+				var batchData []byte
+				for j := 0; j < actualBatchSize; j++ {
+					phrase := PhraseGenerator()
+					batchData = append(batchData, phrase...)
+					batchData = append(batchData, '\n')
+				}
+				
+				select {
+				case batchChan <- batch{data: batchData, size: actualBatchSize}:
+				case <-ctx.Done():
+					return
+				}
+			}
+		}(i, startBatch, endBatch)
+	}
+
+	// Wait for generators and close channel
+	go func() {
+		generatorWg.Wait()
+		close(batchChan)
+	}()
+
+	wg.Wait()
+	
+	// Check for errors
+	select {
+	case err := <-writerErr:
+		return err
+	default:
+	}
+
+	fmt.Printf("Finished writing %d lines in batches of %d using %d workers\n", 
+		totalRows, batchSize, numWorkers)
+	return nil
+}
+
+// OPTIMIZED VERSION 3: Memory pool for maximum performance
+func WriteGoThreadsWithPool(filename string, optionalArgs ...int) error {
+	totalRows := 10_000
+	if len(optionalArgs) > 0 {
+		totalRows = optionalArgs[0]
+	}
+
+	file, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return fmt.Errorf("unable to open %s: %w", filename, err)
+	}
+	defer file.Close()
+
+	writer := bufio.NewWriterSize(file, 256*1024) // 256KB buffer
+	defer func() {
+		if flushErr := writer.Flush(); flushErr != nil {
+			log.Printf("Error flushing writer: %v", flushErr)
+		}
+	}()
+
+	numWorkers := min(runtime.NumCPU()*2, 8)
+	if totalRows < 5000 {
+		numWorkers = 1
+	}
+
+	// Memory pool to reuse byte slices
+	pool := sync.Pool{
+		New: func() interface{} {
+			return make([]byte, 0, 512) // Pre-allocate with capacity
+		},
+	}
+
+	lineChan := make(chan []byte, numWorkers*3)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	var wg sync.WaitGroup
+	writerErr := make(chan error, 1)
+
+	// Writer goroutine
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var linesWritten int64
+		
+		for {
+			select {
+			case line, ok := <-lineChan:
+				if !ok {
+					fmt.Printf("Pool writer finished. Lines: %d\n", linesWritten)
+					return
+				}
+				
+				if _, err := writer.Write(line); err != nil {
+					writerErr <- fmt.Errorf("pool write error: %w", err)
+					return
+				}
+				
+				// Return buffer to pool
+				pool.Put(line[:0])
+				linesWritten++
+				
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+
+	// Work distribution
+	workPerWorker := totalRows / numWorkers
+	remainder := totalRows % numWorkers
+
+	var generatorWg sync.WaitGroup
+
+	for i := 0; i < numWorkers; i++ {
+		generatorWg.Add(1)
+		
+		start := i * workPerWorker
+		end := start + workPerWorker
+		if i == numWorkers-1 {
+			end += remainder
+		}
+		
+		go func(workerID, startIdx, endIdx int) {
+			defer generatorWg.Done()
+			
+			for j := startIdx; j < endIdx; j++ {
+				select {
+				case <-ctx.Done():
+					return
+				default:
+				}
+				
+				phrase := PhraseGenerator()
+				
+				// Get buffer from pool
+				buffer := pool.Get().([]byte)
+				buffer = append(buffer, phrase...)
+				buffer = append(buffer, '\n')
+				
+				select {
+				case lineChan <- buffer:
+				case <-ctx.Done():
+					pool.Put(buffer[:0])
+					return
+				}
+			}
+		}(i, start, end)
+	}
+
+	go func() {
+		generatorWg.Wait()
+		close(lineChan)
+	}()
+
+	wg.Wait()
+	
+	select {
+	case err := <-writerErr:
+		return err
+	default:
+	}
+
+	fmt.Printf("Finished writing %d lines using memory pool with %d workers\n", 
+		totalRows, numWorkers)
+	return nil
+}
