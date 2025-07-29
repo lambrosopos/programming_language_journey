@@ -4,5 +4,5 @@ var FILENAME string = "massive.txt"
 
 func main() {
   // WriteSingleProcessor(FILENAME)
-  WriteGoThreads(FILENAME, 10_000_000)
+  // WriteGoThreadsWithPool(FILENAME, 10_000_000)
 }

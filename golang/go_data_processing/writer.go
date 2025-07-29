@@ -2,113 +2,142 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"log"
 	"os"
 	"runtime"
 	"sync"
-	"sync/atomic"
 )
 
-func WriteSingleProcessor(filename string, optionalArgs ...int) {
-  // Write synchronously to a file
-  totalRows := 10_000
-  if len(optionalArgs) > 0 {
-    totalRows = optionalArgs[0]
-  }
-
-  file, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0777)
-  if err != nil {
-    log.Fatal("Unable to open file:", filename, "\nError:", err)
-  }
-
-  defer file.Close()
-
-  for range(totalRows) {
-    newPhrase := append(PhraseGenerator(), '\n')
-
-    _, err := file.Write(newPhrase)
-    if err != nil {
-      log.Fatal("Unable to write to file:", string(newPhrase), "\nError:", err)
-    }
-  }
-  
-  fmt.Println("Finished writing ")
-}
-
-// Optimized WriteGoThreads function
-func WriteGoThreads(filename string, optionalArgs ...int) {
+// OPTIMIZED VERSION 1: Fixed issues and improved performance
+func WriteGoThreadsOptimized(filename string, optionalArgs ...int) error {
 	totalRows := 10_000
 	if len(optionalArgs) > 0 {
 		totalRows = optionalArgs[0]
 	}
 
-	file, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666) // Changed permissions to 0666
+	file, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		log.Fatalf("Unable to open %s. %s", filename, err)
+		return fmt.Errorf("unable to open %s: %w", filename, err)
 	}
-	defer file.Close() // Ensure the file is closed
+	defer file.Close()
 
-	// Use a buffered writer for efficiency
-	writer := bufio.NewWriter(file)
-	defer writer.Flush() // Ensure all buffered data is written before file is closed
+	// Larger buffer for better I/O performance
+	writer := bufio.NewWriterSize(file, 64*1024) // 64KB buffer
+	defer func() {
+		if flushErr := writer.Flush(); flushErr != nil {
+			log.Printf("Error flushing writer: %v", flushErr)
+		}
+	}()
 
-	// Determine the number of workers based on CPU cores or a fixed number
-	numWorkers := runtime.NumCPU() * 2 // A common heuristic: 2x CPU cores
-	if numWorkers > totalRows {
-		numWorkers = totalRows // Don't create more workers than rows if totalRows is small
-	}
-	if numWorkers == 0 { // Handle case where totalRows is 0 or very small
-		numWorkers = 1
+	// Better worker calculation - cap at reasonable limit
+	numWorkers := min(runtime.NumCPU()*2, 16, totalRows)
+	if totalRows < 1000 {
+		numWorkers = 1 // Don't use concurrency for small jobs
 	}
 
 	var wg sync.WaitGroup
-	lineChan := make(chan []byte, numWorkers*10) // Buffered channel to hold lines to be written
+	// Reduced channel buffer size to prevent excessive memory usage
+	lineChan := make(chan []byte, numWorkers*5)
+	
+	// Context for graceful shutdown
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-	// Start a single writer goroutine
+	// Single writer goroutine with error handling
+	writerErr := make(chan error, 1)
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		var linesWritten atomic.Int64 // Using atomic for a thread-safe counter
-		for line := range lineChan {
-			_, err := writer.Write(line)
-			if err != nil {
-				log.Printf("Error writing line: %v", err)
-				// Depending on your error handling strategy, you might want to stop or retry
+		var linesWritten int64
+		
+		for {
+			select {
+			case line, ok := <-lineChan:
+				if !ok {
+					fmt.Printf("Writer finished. Lines written: %d\n", linesWritten)
+					return
+				}
+				
+				if _, err := writer.Write(line); err != nil {
+					writerErr <- fmt.Errorf("write error at line %d: %w", linesWritten, err)
+					return
+				}
+				linesWritten++
+				
+			case <-ctx.Done():
+				return
 			}
-			linesWritten.Add(1)
 		}
-		fmt.Printf("Writer goroutine finished. Total lines written by writer: %d\n", linesWritten.Load())
 	}()
 
-	// Goroutines to generate phrases and send them to the channel
-	var generatorWg sync.WaitGroup
-	var generatedCount atomic.Int64 // To track how many lines are generated
+	// Work distribution - pre-calculate work per worker
+	workPerWorker := totalRows / numWorkers
+	remainder := totalRows % numWorkers
 
-	// Launch multiple generator goroutines
+	var generatorWg sync.WaitGroup
+	
 	for i := 0; i < numWorkers; i++ {
 		generatorWg.Add(1)
-		go func(workerID int) {
+		
+		// Calculate work range for this worker
+		start := i * workPerWorker
+		end := start + workPerWorker
+		if i == numWorkers-1 {
+			end += remainder // Last worker handles remainder
+		}
+		
+		go func(workerID, startIdx, endIdx int) {
 			defer generatorWg.Done()
-			for {
-				currentGenerated := generatedCount.Add(1)
-				if currentGenerated > int64(totalRows) {
-					break // Stop if we've generated enough lines
+			
+			// Pre-allocate buffer to reduce allocations
+			buffer := make([]byte, 0, 256)
+			
+			for j := startIdx; j < endIdx; j++ {
+				select {
+				case <-ctx.Done():
+					return
+				default:
 				}
-				newPhrase := append(PhraseGenerator(), '\n')
-				lineChan <- newPhrase // Send the generated phrase to the writer
+				
+				phrase := PhraseGenerator()
+				
+				// Reuse buffer to minimize allocations
+				buffer = buffer[:0]
+				buffer = append(buffer, phrase...)
+				buffer = append(buffer, '\n')
+				
+				// Create a copy for the channel (buffer will be reused)
+				line := make([]byte, len(buffer))
+				copy(line, buffer)
+				
+				select {
+				case lineChan <- line:
+				case <-ctx.Done():
+					return
+				}
 			}
-			//fmt.Printf("Generator %d finished.\n", workerID)
-		}(i)
+		}(i, start, end)
 	}
 
-	// Wait for all generator goroutines to complete their work
-	generatorWg.Wait()
-	close(lineChan) // Close the channel when all generators are done, signaling the writer to exit
+	// Wait for generators and close channel
+	go func() {
+		generatorWg.Wait()
+		close(lineChan)
+	}()
 
-	// Wait for the single writer goroutine to finish processing all lines
+	// Wait for writer and check for errors
 	wg.Wait()
+	
+	// Check for writer errors
+	select {
+	case err := <-writerErr:
+		return err
+	default:
+	}
 
-	fmt.Printf("Finished writing %d lines to %s using optimized Go routines.\n", totalRows, filename)
+	fmt.Printf("Finished writing %d lines to %s using %d workers\n", totalRows, filename, numWorkers)
+	return nil
 }
 

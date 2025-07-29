@@ -13,23 +13,16 @@ func removeFile(filename string) {
   }
 }
 
-func SingleWriter1_000_000(b *testing.B) {
+// func BenchmarkSingle(b *testing.B) {
+//   removeFile(FILENAME)
+
+  // b.ResetTimer()
+//   WriteGoThreadsWithPool(FILENAME, 100_000_00)
+// }
+
+func BenchmarkParallel(b *testing.B) {
   removeFile(FILENAME)
 
-  b.ResetTimer()
-  WriteSingleProcessor(FILENAME, 1_000_000)
-}
-
-func SingleWriter10_000_000(b *testing.B) {
-  removeFile(FILENAME)
-
-  b.ResetTimer()
-  WriteSingleProcessor(FILENAME, 10_000_000)
-}
-
-func GoRoutineWriter10_000_000(b *testing.B) {
-  removeFile(FILENAME)
-
-  b.ResetTimer()
-  WriteGoThreads(FILENAME, 10_000_000)
+  // b.ResetTimer()
+  WriteGoThreadsOptimized(FILENAME, 100_000_00)
 }
